@@ -21,7 +21,7 @@ const AshProducts = () => {
 
   useEffect(() => {
     // تحديث رابط الـ API
-    const API_BASE_URL = 'https://ash-storef.vercel.app'; // استبدل هذا بالرابط الحقيقي لمشروعك على Vercel
+    const API_BASE_URL = 'https://ashstore.vercel.app'; // استبدل هذا بالرابط الحقيقي لمشروعك على Vercel
 
     fetch(`${API_BASE_URL}/api/products/allproducts`) // تم تحديث الرابط هنا
       .then(res => {
