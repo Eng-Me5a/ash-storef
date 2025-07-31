@@ -5,11 +5,12 @@ import { FaCartPlus } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 
+// تحديث واجهة Product لتتوافق مع الموديل الجديد
 interface Product {
-  id: number;
-  title: string;
-  image: string;
-  price: string;
+  _id: string; // المعرف الآن هو _id من MongoDB
+  name: string; // الاسم الآن هو name بدلاً من title
+  imageUrl: string; // الصورة الآن هي imageUrl بدلاً من image
+  price: number; // السعر الآن هو number بدلاً من string
   quantity?: number;
 }
 
@@ -19,17 +20,26 @@ const AshProducts = () => {
   const { updateCartCount } = useCart();
 
   useEffect(() => {
-    fetch('http://localhost:5000/allproducts')
-      .then(res => res.json())
+    // تحديث رابط الـ API
+    const API_BASE_URL = 'https://ash-storef.vercel.app'; // استبدل هذا بالرابط الحقيقي لمشروعك على Vercel
+
+    fetch(`${API_BASE_URL}/api/products/allproducts`) // تم تحديث الرابط هنا
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => setProducts(data))
-      .catch(err => console.error('فشل تحميل المنتجات', err))
+      .catch(err => console.error('فشل تحميل المنتجات:', err))
       .finally(() => setLoading(false));
   }, []);
 
   const addToCart = (product: Product) => {
     const existingCart: Product[] = JSON.parse(localStorage.getItem('cart') || '[]');
     const updatedCart = [...existingCart];
-    const existingIndex = updatedCart.findIndex((item) => item.id === product.id);
+    // استخدام _id للمقارنة
+    const existingIndex = updatedCart.findIndex((item) => item._id === product._id);
 
     if (existingIndex !== -1) {
       updatedCart[existingIndex].quantity = (updatedCart[existingIndex].quantity || 1) + 1;
@@ -51,17 +61,17 @@ const AshProducts = () => {
         ) : (
           <Row>
             {products.map((product) => (
-              <Col key={product.id} md={4} sm={6} xs={12} className="mb-4">
-                <Link to={`/product/allproducts/${product.id}`} className="text-decoration-none text-dark">
+              <Col key={product._id} md={4} sm={6} xs={12} className="mb-4">
+                <Link to={`/product/allproducts/${product._id}`} className="text-decoration-none text-dark">
                   <Card className="h-100 shadow-sm text-center card-hover border-0">
                     <Card.Img
                       variant="top"
-                      src={product.image}
-                      alt={product.title}
+                      src={product.imageUrl} // استخدام imageUrl بدلاً من image
+                      alt={product.name} // استخدام name بدلاً من title
                       style={{ height: '250px', objectFit: 'cover', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
                     />
                     <Card.Body className="d-flex flex-column justify-content-between">
-                      <Card.Text className="fw-bold fs-5 mb-2">{product.title}</Card.Text>
+                      <Card.Text className="fw-bold fs-5 mb-2">{product.name}</Card.Text> {/* استخدام name بدلاً من title */}
                       <div className="d-flex justify-content-between align-items-center mt-auto">
                         <span className="text-danger fw-bold fs-6">{product.price} جنيه</span>
                         <Button
